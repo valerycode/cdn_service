@@ -1,0 +1,16 @@
+global:
+  scrape_interval:     5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ['localhost:9090']
+  - job_name: minio-job
+    metrics_path: /minio/v2/metrics/cluster
+    scheme: http
+    authorization:
+      type: Bearer
+      credentials_file: /etc/prometheus/.minio_jwt
+    static_configs:
+    - targets: ['nginx-minio-0', 'nginx-minio-1', 'nginx-minio-2']

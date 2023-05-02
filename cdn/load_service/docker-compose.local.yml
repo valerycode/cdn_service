@@ -1,0 +1,48 @@
+# docker-compose.yaml
+name: s3-storage
+services:
+ minio1:
+   image: minio/minio:latest
+   container_name: minio_1
+   command: server --console-address ":9001" /data/
+   ports:
+     - "9010:9000"
+     - "9011:9001"
+   environment:
+    MINIO_ROOT_USER: ${S3LS_ACCESS_KEY}
+    MINIO_ROOT_PASSWORD: ${S3LS_SECRET_KEY}
+
+   volumes:
+     - minio-storage_1:/data
+   healthcheck:
+     test: ["CMD", "curl", "-f", "http://localhost:9010/minio/health/live"]
+     interval: 30s
+     timeout: 20s
+     retries: 3
+
+ minio2:
+   image: minio/minio:latest
+   container_name: minio_2
+   command: server --console-address ":9001" /data/
+   ports:
+     - "9020:9000"
+     - "9021:9001"
+   environment:
+     MINIO_ROOT_USER: ${S3LS_ACCESS_KEY}
+     MINIO_ROOT_PASSWORD: ${S3LS_SECRET_KEY}
+
+   volumes:
+     - minio-storage_2:/data
+   healthcheck:
+     test: ["CMD", "curl", "-f", "http://localhost:9020/minio/health/live"]
+     interval: 30s
+     timeout: 20s
+     retries: 3
+
+volumes:
+  minio-storage_1:
+  minio-storage_2:
+
+networks:
+  default:
+    name: s3-network

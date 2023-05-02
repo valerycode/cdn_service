@@ -1,0 +1,50 @@
+version: '3.8'
+services:
+  fastapi_test:
+    build: ../../..
+    image: fastapi-image
+    env_file:
+      - .env
+    depends_on:
+      - elastic_test
+      - redis_test
+    restart: always
+
+  minio-0:
+    image: minio/minio:RELEASE.2023-03-24T21-41-23Z
+    container_name: minio-0
+    command: server --console-address ":9001" /data/
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
+    volumes:
+      - minio_0_data:/data
+
+  minio-1:
+    image: minio/minio:RELEASE.2023-03-24T21-41-23Z
+    container_name: minio-1
+    command: server --console-address ":9001" /data/
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
+    volumes:
+      - minio_1_data:/data
+
+  minio-2:
+    image: minio/minio:RELEASE.2023-03-24T21-41-23Z
+    container_name: minio-2
+    command: server --console-address ":9001" /data/
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
+    volumes:
+      - minio_2_data:/data
+
+  tests:
+    build: .
+    env_file:
+      - .env
+    entrypoint: >
+      sh -c "python3 /tests/functional/utils/wait_for_es.py
+      && python3 /tests/functional/utils/wait_for_redis.py
+      && pytest src"
