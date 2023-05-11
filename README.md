@@ -1,3 +1,8 @@
+# CDN for online cinema(educational project)
+
+## Technologies:
+Python 3, Django, FastAPI, Docker, Docker-Compose, NGINX, PostgreSQL, Redis, Celery, SQLAlchemy
+
 ### Launching Services
 
 Rename `env.example` to `.env`, rename `.minio_jwt_example` to `.minio_jwt` in the `/prometheus` folder, then execute `make dev-run`.
