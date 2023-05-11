@@ -1,25 +1,19 @@
-### Запуск сервисов
+### Launching Services
 
-Переименуйте env.example в .env, в папке /prometheus переименуйте .minio_jwt_example
- .minio_jwt. Затем выполните `make dev-run`
+Rename `env.example` to `.env`, rename `.minio_jwt_example` to `.minio_jwt` in the `/prometheus` folder, then execute `make dev-run`.
 
+### Monitoring
 
-### Мониторинг
+Prometheus is used for monitoring. During development and debugging, you can build graphs at http://localhost:9090 using PromQL. Specifically, you can check the number of files in the bucket with the expression `minio_bucket_usage_object_total{bucket="movies", instance="nginx-minio-0:80"}`, and the free disk space with `minio_cluster_capacity_usable_free_bytes{instance="nginx-minio-0:80"}`.
+These data can also be obtained through the Prometheus HTTP API when requesting from the container (Minio updates data once per minute).
 
-Для мониторинга используется Prometheus. Графики в процессе разработки и
-дебаггинга можно построить на http://localhost:9090 c использованием PromQL.
-В частности, количество файлов в бакете можно посмотреть с помощью выражения
-`minio_bucket_usage_object_total{bucket="movies", instance="nginx-minio-0:80"}`,
-свободное место на диске `minio_cluster_capacity_usable_free_bytes{instance="nginx-minio-0:80"}`
-Эти данные также можно получить с помощью  HTTP API Prometheus при запросе из
-контейнера (minio обновляет данные раз в минуту)
-```
+```python
 import requests
 
 data = {"query": 'minio_bucket_usage_object_total{bucket="movies",instance="minio-0:9000"}'}
 
 response = requests.get("http://prometheus:9090/api/v1/query", params=data)
-print(resposne.json())
+print(response.json())
 
 response = requests.post("http://prometheus:9090/api/v1/query", data=data)
 print(response.json())
